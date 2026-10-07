@@ -1,0 +1,8 @@
+/build/
+/dist/
+*.test
+*.out
+*.pem
+*.key
+state/
+/docs/screenshots/
