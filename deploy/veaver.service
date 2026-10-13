@@ -1,24 +1,24 @@
 [Unit]
-Description=Linkweave NetworkManager extension and local dashboard
+Description=Veaver NetworkManager extension and local dashboard
 Documentation=https://networkmanager.dev/docs/
 Wants=NetworkManager.service
 After=NetworkManager.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/linkweave serve --config /etc/linkweave/config.json --state-dir /var/lib/linkweave
-ExecStopPost=/usr/local/bin/linkweave cleanup --state-dir /var/lib/linkweave
+ExecStart=/usr/local/bin/veaver serve --config /etc/veaver/config.json --state-dir /var/lib/veaver
+ExecStopPost=/usr/local/bin/veaver cleanup --state-dir /var/lib/veaver
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=45
-StateDirectory=linkweave
+StateDirectory=veaver
 StateDirectoryMode=0700
 UMask=0077
 NoNewPrivileges=true
 CapabilityBoundingSet=CAP_NET_ADMIN
 AmbientCapabilities=CAP_NET_ADMIN
 ProtectSystem=strict
-ReadWritePaths=/etc/linkweave /var/lib/linkweave /proc/sys/net/ipv4/conf
+ReadWritePaths=/etc/veaver /var/lib/veaver /proc/sys/net/ipv4/conf
 ProtectHome=true
 PrivateTmp=true
 ProtectKernelModules=true

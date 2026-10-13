@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 if [ "$(id -u)" -ne 0 ]; then echo 'Run with sudo.' >&2; exit 1; fi
-if systemctl is-active --quiet linkweave.service; then
-  /usr/local/bin/linkweave restore --state-dir /var/lib/linkweave
+if systemctl is-active --quiet veaver.service; then
+  /usr/local/bin/veaver restore --state-dir /var/lib/veaver
 fi
-systemctl disable --now linkweave.service
-/usr/local/bin/linkweave cleanup --state-dir /var/lib/linkweave
-rm -f /etc/systemd/system/linkweave.service /etc/NetworkManager/dispatcher.d/90-linkweave /usr/local/bin/linkweave
+systemctl disable --now veaver.service
+/usr/local/bin/veaver cleanup --state-dir /var/lib/veaver
+rm -f /etc/systemd/system/veaver.service /etc/NetworkManager/dispatcher.d/90-veaver /usr/local/bin/veaver
 systemctl daemon-reload
-echo 'Removed Linkweave service. Configuration and diagnostics retained in /etc/linkweave and /var/lib/linkweave.'
+echo 'Removed Veaver service. Configuration and diagnostics retained in /etc/veaver and /var/lib/veaver.'

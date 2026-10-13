@@ -1,4 +1,4 @@
-# Initial verification — 2026-10-10
+# Initial verification — 2026-10-10 (before the Veaver rename)
 
 Tested development host: Linux amd64, NetworkManager 1.58.1, kernel 6.18.52-1-cachyos-lts. This is a development verification record, not a universal compatibility or performance certification.
 
@@ -16,7 +16,7 @@ Tested development host: Linux amd64, NetworkManager 1.58.1, kernel 6.18.52-1-ca
 | Chromium desktop/mobile check | Passed authentication, live interfaces, activity/journal logs, filtering, refresh, mode review without apply, no horizontal overflow at 390 px, and no browser errors/missing assets. |
 | Native/arm64 static builds | Passed; frontend assets are embedded. |
 | Installer staging | Passed with `DESTDIR`, without installing a host service. |
-| systemd unit validation | Passed against the staged executable. The original installed-path unit naturally requires `/usr/local/bin/linkweave` to exist after installation. |
+| systemd unit validation | Passed against the staged executable. The original installed-path unit naturally requires `/usr/local/bin/veaver` to exist after installation. |
 
 The host's routing policy was not changed or enabled during live dashboard verification. Network-changing tests ran only in fresh user/network namespaces and refused execution if host interfaces were present. A new `/proc` mount was unavailable on this host, so the harness uses user/network namespace isolation without a mount namespace.
 

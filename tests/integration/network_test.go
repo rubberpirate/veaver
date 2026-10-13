@@ -23,12 +23,12 @@ import (
 	"testing"
 	"time"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/transport"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/transport"
 )
 
 func TestNamespacePeer(t *testing.T) {
-	if os.Getenv("LINKWEAVE_PEER") != "1" {
+	if os.Getenv("VEAVER_PEER") != "1" {
 		t.Skip("isolated peer helper")
 	}
 	run := func(args ...string) {
@@ -70,7 +70,7 @@ func TestNamespacePeer(t *testing.T) {
 			_, _ = udp.WriteToUDP(reply, source)
 		}
 	}()
-	pair, e := tls.LoadX509KeyPair(filepath.Join(os.Getenv("LINKWEAVE_CERT_DIR"), "cert.pem"), filepath.Join(os.Getenv("LINKWEAVE_CERT_DIR"), "key.pem"))
+	pair, e := tls.LoadX509KeyPair(filepath.Join(os.Getenv("VEAVER_CERT_DIR"), "cert.pem"), filepath.Join(os.Getenv("VEAVER_CERT_DIR"), "key.pem"))
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -112,7 +112,7 @@ func credentials(t *testing.T) string {
 }
 
 func TestRealBalanceAndTransparentRelay(t *testing.T) {
-	if os.Getenv("LINKWEAVE_NETNS_TEST") != "1" {
+	if os.Getenv("VEAVER_NETNS_TEST") != "1" {
 		t.Skip("run scripts/test-netns.sh")
 	}
 	devices, e := net.Interfaces()
@@ -134,7 +134,7 @@ func TestRealBalanceAndTransparentRelay(t *testing.T) {
 	}
 	dir := credentials(t)
 	peer := exec.Command("unshare", "--net", os.Args[0], "-test.run=^TestNamespacePeer$", "-test.v")
-	peer.Env = append(os.Environ(), "LINKWEAVE_PEER=1", "LINKWEAVE_CERT_DIR="+dir)
+	peer.Env = append(os.Environ(), "VEAVER_PEER=1", "VEAVER_CERT_DIR="+dir)
 	stdout, e := peer.StdoutPipe()
 	if e != nil {
 		t.Fatal(e)

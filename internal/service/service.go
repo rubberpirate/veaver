@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/transport"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/transport"
 )
 
 type Config struct {
@@ -137,7 +137,7 @@ func New(configPath, stateDir string, nm Monitor, runner platform.Runner) (*Serv
 	}
 	if e = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); e != nil {
 		_ = f.Close()
-		return nil, errors.New("another Linkweave daemon is using this state directory")
+		return nil, errors.New("another Veaver daemon is using this state directory")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &Service{cfg: cfg, configPath: configPath, nm: nm, routing: platform.NewRouting(filepath.Join(stateDir, "routing.json"), runner), ctx: ctx, cancel: cancel, wake: make(chan struct{}, 1), done: make(chan struct{}), previous: map[string]platform.Interface{}, lock: f}
@@ -150,7 +150,7 @@ func New(configPath, stateDir string, nm Monitor, runner platform.Runner) (*Serv
 		s.release()
 		return nil, fmt.Errorf("routing recovery: %w", e)
 	}
-	s.Log("info", "service", "Linkweave started; NetworkManager owns physical connectivity")
+	s.Log("info", "service", "Veaver started; NetworkManager owns physical connectivity")
 	go s.loop()
 	return s, nil
 }
@@ -245,7 +245,7 @@ func (s *Service) Plan(c Config) (platform.Plan, error) {
 		return platform.Plan{}, e
 	}
 	if c.Mode == "observe" {
-		return platform.Plan{Mode: "observe", Commands: []platform.Command{}, Interfaces: []string{}, Warnings: []string{"Restore Linkweave-owned rules; preserve NetworkManager configuration"}}, nil
+		return platform.Plan{Mode: "observe", Commands: []platform.Command{}, Interfaces: []string{}, Warnings: []string{"Restore Veaver-owned rules; preserve NetworkManager configuration"}}, nil
 	}
 	snap := s.Snapshot()
 	if snap.Network.Version == "" {

@@ -25,22 +25,22 @@ import (
 	"syscall"
 	"time"
 
-	"linkweave/internal/console"
-	"linkweave/internal/platform"
-	"linkweave/internal/service"
-	"linkweave/internal/transport"
-	"linkweave/internal/web"
+	"github.com/rubberpirate/veaver/internal/console"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/service"
+	"github.com/rubberpirate/veaver/internal/transport"
+	"github.com/rubberpirate/veaver/internal/web"
 )
 
 func main() {
 	if e := run(os.Args[1:]); e != nil {
-		fmt.Fprintln(os.Stderr, "linkweave:", e)
+		fmt.Fprintln(os.Stderr, "veaver:", e)
 		os.Exit(1)
 	}
 }
 func defaults() (string, string) {
 	if os.Geteuid() == 0 {
-		return "/etc/linkweave/config.json", "/var/lib/linkweave"
+		return "/etc/veaver/config.json", "/var/lib/veaver"
 	}
 	dir, e := os.UserConfigDir()
 	if e != nil {
@@ -50,7 +50,7 @@ func defaults() (string, string) {
 	if e != nil {
 		state = "."
 	}
-	return filepath.Join(dir, "linkweave", "config.json"), filepath.Join(state, "linkweave")
+	return filepath.Join(dir, "veaver", "config.json"), filepath.Join(state, "veaver")
 }
 func run(args []string) error {
 	if len(args) == 0 {
@@ -70,7 +70,7 @@ func run(args []string) error {
 	case "cert":
 		return certificate(args[1:])
 	case "version":
-		fmt.Println("Linkweave 0.2.0")
+		fmt.Println("Veaver 0.2.0")
 		return nil
 	case "status", "dashboard", "plan", "apply", "restore", "refresh":
 		return client(args[0], args[1:])
@@ -107,21 +107,21 @@ func cleanup(args []string) error {
 	return r.Cleanup(context.Background())
 }
 func usage() {
-	fmt.Print(`Linkweave — a NetworkManager extension and local network console
+	fmt.Print(`Veaver — a NetworkManager extension and local network console
 
-  linkweave [tui]       Open the live terminal dashboard
-  linkweave serve       Start daemon (observe by default)
-  linkweave dashboard   Print your authenticated dashboard URL
-  linkweave status      Read daemon statistics as JSON
-  linkweave doctor      Inspect NetworkManager and kernel capabilities
-  linkweave plan       Review config without changing networking
-  linkweave apply      Apply a reviewed JSON config through the daemon
-  linkweave restore    Restore Linkweave-owned routing to stock networking
-  linkweave refresh    Refresh NetworkManager state (dispatcher integration)
-  linkweave cert       Generate relay TLS credentials and a token
-  linkweave relay      Run an authenticated MPTCP TCP relay
+  veaver [tui]       Open the live terminal dashboard
+  veaver serve       Start daemon (observe by default)
+  veaver dashboard   Print your authenticated dashboard URL
+  veaver status      Read daemon statistics as JSON
+  veaver doctor      Inspect NetworkManager and kernel capabilities
+  veaver plan       Review config without changing networking
+  veaver apply      Apply a reviewed JSON config through the daemon
+  veaver restore    Restore Veaver-owned routing to stock networking
+  veaver refresh    Refresh NetworkManager state (dispatcher integration)
+  veaver cert       Generate relay TLS credentials and a token
+  veaver relay      Run an authenticated MPTCP TCP relay
 
-Use 'linkweave <command> -h' for flags. Direct balancing is per connection;
+Use 'veaver <command> -h' for flags. Direct balancing is per connection;
 single-stream TCP bonding needs a relay. IPv6 and UDP relay bonding are excluded.
 `)
 }
@@ -165,7 +165,7 @@ func serve(args []string) error {
 	}
 	defer l.Close()
 	actual := l.Addr().String()
-	fmt.Printf("Daemon: http://%s\nAccess token file: %s\nUse 'linkweave tui --state-dir %s --url http://%s' to connect.\n", actual, filepath.Join(*state, "dashboard-token"), *state, actual)
+	fmt.Printf("Daemon: http://%s\nAccess token file: %s\nUse 'veaver tui --state-dir %s --url http://%s' to connect.\n", actual, filepath.Join(*state, "dashboard-token"), *state, actual)
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	return web.New(s, token, actual).Serve(ctx, l)

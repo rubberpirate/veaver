@@ -13,8 +13,8 @@ import time
 import urllib.request
 
 root = Path(__file__).resolve().parents[1]
-state = os.environ["LINKWEAVE_TEST_STATE_DIR"]
-url = os.environ.get("LINKWEAVE_TEST_URL", "http://127.0.0.1:8787")
+state = os.environ["VEAVER_TEST_STATE_DIR"]
+url = os.environ.get("VEAVER_TEST_URL", "http://127.0.0.1:8787")
 token = (Path(state) / "dashboard-token").read_text().strip()
 opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
@@ -30,7 +30,7 @@ assert before["mode"] == "observe", "Use a dedicated Observe daemon for this tes
 master, slave = pty.openpty()
 original = termios.tcgetattr(slave)
 fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 32, 100, 0, 0))
-process = subprocess.Popen([str(root / "build/linkweave"), "tui", "--state-dir", state, "--url", url],
+process = subprocess.Popen([str(root / "build/veaver"), "tui", "--state-dir", state, "--url", url],
                            stdin=slave, stdout=slave, stderr=slave)
 output = bytearray()
 

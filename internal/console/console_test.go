@@ -11,8 +11,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/service"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/service"
 )
 
 func TestRenderSafeResponsiveAndPolicyDraft(t *testing.T) {

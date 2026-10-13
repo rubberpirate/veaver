@@ -1,13 +1,13 @@
 'use strict';
 const $ = id => document.getElementById(id);
-let token = sessionStorage.getItem('linkweave-token') || '';
+let token = sessionStorage.getItem('veaver-token') || '';
 let snapshot = null, pending = null, journalEvents = [], busy = false, configured = false;
 const colors = {rx:'#19947b', tx:'#6397cc'};
 function text(id, value) { $(id).textContent = value; }
 function formatBytes(value) { if (!Number.isFinite(value) || value < 0) return '—'; const units=['B','KB','MB','GB','TB']; let i=0; while(value>=1024&&i<units.length-1){value/=1024;i++;} return `${value.toFixed(i ? 1 : 0)} ${units[i]}`; }
 function rate(value) { return `${formatBytes(value)}/s`; }
 function node(tag, className, value) { const el=document.createElement(tag); if(className)el.className=className;if(value!==undefined)el.textContent=value;return el; }
-async function api(path, body) { const response=await fetch(`/api/${path}`,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});const result=await response.json();if(!response.ok){if(response.status===401){$('auth-panel').classList.remove('hidden');sessionStorage.removeItem('linkweave-token');}throw Error(result.error||`HTTP ${response.status}`);}return result; }
+async function api(path, body) { const response=await fetch(`/api/${path}`,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});const result=await response.json();if(!response.ok){if(response.status===401){$('auth-panel').classList.remove('hidden');sessionStorage.removeItem('veaver-token');}throw Error(result.error||`HTTP ${response.status}`);}return result; }
 function toast(message, error=false) { const el=$('toast');el.textContent=message;el.className=`toast${error?' error':''}`;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),7000); }
 function svgElement(tag, attributes) { const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [key,value]of Object.entries(attributes))el.setAttribute(key,String(value));return el; }
 function points(values,width,height,max){if(!values.length)return '';return values.map((v,i)=>`${values.length===1?width:i*width/(values.length-1)},${height-4-Math.max(0,v)/max*(height-8)}`).join(' ');}
@@ -44,14 +44,14 @@ function getConfig(){const weights={};for(const entry of $('weight-input').value
 function toggleRelay(){$('relay-fields').classList.toggle('hidden',document.querySelector('input[name="mode"]:checked').value!=='relay');}
 async function poll(){if(!token||busy)return;try{render(await api('status'));}catch(e){text('side-status','Daemon unavailable');toast(e.message,true);}}
 async function review(c){try{const plan=await api('plan',c);pending=c;text('review-description',`Switch to ${c.mode} mode${plan.interfaces.length?` using ${plan.interfaces.join(', ')}`:''}.`);$('review-warnings').replaceChildren(...(plan.warnings||[]).map(w=>node('li','',w)));text('review-plan',[...(plan.commands||[]).map(c=>`${c.program} ${c.args.join(' ')}`),plan.nft||''].join('\n'));$('review-dialog').showModal();}catch(e){toast(e.message,true);}}
-$('auth-form').addEventListener('submit',async e=>{e.preventDefault();token=$('token').value.trim();sessionStorage.setItem('linkweave-token',token);$('token').value='';await poll();});
+$('auth-form').addEventListener('submit',async e=>{e.preventDefault();token=$('token').value.trim();sessionStorage.setItem('veaver-token',token);$('token').value='';await poll();});
 $('policy-form').addEventListener('submit',e=>{e.preventDefault();try{review(getConfig());}catch(error){toast(error.message,true);}});document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',toggleRelay));
 $('restore').addEventListener('click',()=>{try{review({...getConfig(),mode:'observe'});}catch(error){toast(error.message,true);}});for(const id of ['close-review','cancel-review'])$(id).addEventListener('click',()=>$('review-dialog').close());
 $('confirm-review').addEventListener('click',async()=>{if(!pending)return;busy=true;$('confirm-review').disabled=true;try{await api('config',pending);configured=false;$('review-dialog').close();toast(`Policy applied: ${pending.mode}`);}catch(e){toast(e.message,true);}finally{busy=false;$('confirm-review').disabled=false;await poll();}});
 $('refresh').addEventListener('click',async()=>{try{await api('refresh',{});await poll();toast('Network refresh requested');}catch(e){toast(e.message,true);}});
-$('journal').addEventListener('click',async()=>{try{const result=await api('logs');journalEvents=result.events||[];text('journal-note',result.note||'NetworkManager & Linkweave system journal + service events');renderLogs();}catch(e){toast(e.message,true);}});
+$('journal').addEventListener('click',async()=>{try{const result=await api('logs');journalEvents=result.events||[];text('journal-note',result.note||'NetworkManager & Veaver system journal + service events');renderLogs();}catch(e){toast(e.message,true);}});
 $('log-filter').addEventListener('input',renderLogs);
-$('export').addEventListener('click',()=>{if(!snapshot){toast('Connect the console first',true);return;}const report={...snapshot,config:{...snapshot.config,relay:{address:snapshot.config.relay.address,server_name:snapshot.config.relay.server_name}},events:[]};const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const a=node('a');a.href=url;a.download='linkweave-diagnostics.json';a.click();URL.revokeObjectURL(url);toast('Diagnostic report exported without tokens or logs');});
+$('export').addEventListener('click',()=>{if(!snapshot){toast('Connect the console first',true);return;}const report={...snapshot,config:{...snapshot.config,relay:{address:snapshot.config.relay.address,server_name:snapshot.config.relay.server_name}},events:[]};const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const a=node('a');a.href=url;a.download='veaver-diagnostics.json';a.click();URL.revokeObjectURL(url);toast('Diagnostic report exported without tokens or logs');});
 document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}));
-if(location.hash.startsWith('#token=')){token=location.hash.slice(7);sessionStorage.setItem('linkweave-token',token);history.replaceState(null,'',location.pathname);}
+if(location.hash.startsWith('#token=')){token=location.hash.slice(7);sessionStorage.setItem('veaver-token',token);history.replaceState(null,'',location.pathname);}
 poll();setInterval(poll,2000);

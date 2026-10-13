@@ -17,8 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/service"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/service"
 )
 
 //go:embed assets/*
@@ -177,10 +177,10 @@ func (s *Server) Serve(ctx context.Context, l net.Listener) error {
 func (s *Server) logs(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 4*time.Second)
 	defer cancel()
-	out, e := platform.ExecRunner{}.Run(ctx, platform.Command{Program: "journalctl", Args: []string{"--no-pager", "-n", "150", "-o", "json", "-u", "NetworkManager.service", "-u", "linkweave.service"}})
+	out, e := platform.ExecRunner{}.Run(ctx, platform.Command{Program: "journalctl", Args: []string{"--no-pager", "-n", "150", "-o", "json", "-u", "NetworkManager.service", "-u", "veaver.service"}})
 	events := []service.Event{}
 	if e != nil {
-		respond(w, 200, map[string]any{"events": events, "note": "Journal access unavailable; Linkweave events remain available in the dashboard"})
+		respond(w, 200, map[string]any{"events": events, "note": "Journal access unavailable; Veaver events remain available in the dashboard"})
 		return
 	}
 	for _, line := range strings.Split(out, "\n") {

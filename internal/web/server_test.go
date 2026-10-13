@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/service"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/service"
 )
 
 type testBackend struct{ updates int }

@@ -35,7 +35,7 @@ func NewClient(address, state string) (*Client, error) {
 	}
 	b, err := os.ReadFile(filepath.Join(state, "dashboard-token"))
 	if err != nil {
-		return nil, fmt.Errorf("read daemon token: %w; for a system service use sudo linkweave tui", err)
+		return nil, fmt.Errorf("read daemon token: %w; for a system service use sudo veaver tui", err)
 	}
 	token := strings.TrimSpace(string(b))
 	if _, err = hex.DecodeString(token); err != nil || len(token) != 64 {

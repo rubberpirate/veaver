@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"linkweave/internal/platform"
+	"github.com/rubberpirate/veaver/internal/platform"
 )
 
 type mockNM struct {

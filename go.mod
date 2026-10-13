@@ -1,4 +1,4 @@
-module linkweave
+module github.com/rubberpirate/veaver
 
 go 1.23.0
 

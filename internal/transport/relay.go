@@ -20,7 +20,7 @@ import (
 	"syscall"
 	"time"
 
-	"linkweave/internal/platform"
+	"github.com/rubberpirate/veaver/internal/platform"
 )
 
 type RelayConfig struct {

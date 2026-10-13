@@ -12,7 +12,7 @@ import (
 
 // These commands are allowed only in a fresh isolated network namespace.
 func TestNamespaceRoutingIntegration(t *testing.T) {
-	if os.Getenv("LINKWEAVE_NETNS_TEST") != "1" {
+	if os.Getenv("VEAVER_NETNS_TEST") != "1" {
 		t.Skip("run scripts/test-netns.sh for isolated kernel routing validation")
 	}
 	interfaces, e := net.Interfaces()

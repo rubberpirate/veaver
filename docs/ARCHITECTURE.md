@@ -1,6 +1,6 @@
 # Architecture
 
-Linkweave is a NetworkManager companion extension, not a NetworkManager source fork or a VPN service plugin. It uses the stable public D-Bus API and standard dispatcher lifecycle hooks. A formal VPN profile/editor plugin is not required by the implemented transparent-interception backend and is not included.
+Veaver is a NetworkManager companion extension, not a NetworkManager source fork or a VPN service plugin. It uses the stable public D-Bus API and standard dispatcher lifecycle hooks. A formal VPN profile/editor plugin is not required by the implemented transparent-interception backend and is not included.
 
 ```text
 NetworkManager ──D-Bus──► monitor ──► snapshots ──► authenticated TUI / optional browser
@@ -19,7 +19,7 @@ NetworkManager ──D-Bus──► monitor ──► snapshots ──► authen
 
 ## Modules
 
-- `cmd/linkweave`: daemon, CLI, diagnostic inspection, credential generation, relay server, recovery command.
+- `cmd/veaver`: daemon, CLI, diagnostic inspection, credential generation, relay server, recovery command.
 - `internal/platform`: NetworkManager D-Bus properties, Linux hardware counters, diagnostics, argument-array command execution, deterministic policy-route/nft generation, atomic recovery state, owned-resource rollback.
 - `internal/service`: configuration, uplink selection, two-second sampling, bounded activity/history, serialization of policy operations, reconciliation after network changes, relay lifecycle.
 - `internal/transport`: TLS CONNECT protocol, credential verification, bounded concurrent streams, standard Go MPTCP sockets, conntrack original-destination lookup, duplex forwarding and payload metrics.

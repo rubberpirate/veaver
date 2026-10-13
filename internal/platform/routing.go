@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-const Table = "linkweave"
+const Table = "veaver"
 const BypassMark = 0x4c570fff
 const reservedMask = 0xffff0000
 
@@ -108,7 +108,7 @@ func WeightedRoutePlan(mode string, links []Interface, relayPort int, weights ma
 		ifnames = append(ifnames, strconv.Quote(d.Name))
 	}
 	var b strings.Builder
-	b.WriteString("table ip linkweave {\n")
+	b.WriteString("table ip veaver {\n")
 	b.WriteString(" set bypass { type ipv4_addr; flags interval; elements = { 0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16, 224.0.0.0/4, 240.0.0.0/4 } }\n")
 	if mode == "balance" {
 		b.WriteString(" chain steer { type route hook output priority mangle; policy accept;\n")
@@ -153,7 +153,7 @@ func AtomicJSON(path string, v any, mode os.FileMode) error {
 	if e = os.MkdirAll(filepath.Dir(path), 0700); e != nil {
 		return e
 	}
-	f, e := os.CreateTemp(filepath.Dir(path), ".linkweave-*")
+	f, e := os.CreateTemp(filepath.Dir(path), ".veaver-*")
 	if e != nil {
 		return e
 	}
@@ -206,7 +206,7 @@ func (r *Routing) Apply(ctx context.Context, p Plan) error {
 	// Change the scheduler atomically when the route topology stays the same.
 	// Keeping routes and conntrack marks preserves active uploads/downloads.
 	if r.state.OwnsNFT && r.applied != nil && r.applied.Mode == p.Mode && reflect.DeepEqual(r.applied.Commands, p.Commands) {
-		transaction := "delete table ip linkweave\n" + p.NFT
+		transaction := "delete table ip veaver\n" + p.NFT
 		if _, e := r.Runner.Run(ctx, Command{"nft", []string{"-c", "-f", "-"}, transaction}); e != nil {
 			return fmt.Errorf("nft preflight: %w", e)
 		}
@@ -232,7 +232,7 @@ func (r *Routing) Apply(ctx context.Context, p Plan) error {
 	}
 	// Refuse ownership collisions instead of deleting another program's resources.
 	if _, e := r.Runner.Run(ctx, Command{"nft", []string{"list", "table", "ip", Table}, ""}); e == nil {
-		return errors.New("nft table linkweave exists without our recovery state")
+		return errors.New("nft table veaver exists without our recovery state")
 	}
 	rules, e := r.Runner.Run(ctx, Command{"ip", []string{"-j", "-4", "rule", "show"}, ""})
 	if e != nil {

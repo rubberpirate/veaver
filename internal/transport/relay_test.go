@@ -101,7 +101,7 @@ func TestRelayRoundTripAuthenticationAndCancellation(t *testing.T) {
 		t.Fatal(e)
 	}
 	_ = c.SetDeadline(time.Now().Add(5 * time.Second))
-	payload := bytes.Repeat([]byte("linkweave-bidirectional\x00"), 65536)
+	payload := bytes.Repeat([]byte("veaver-bidirectional\x00"), 65536)
 	writeDone := make(chan error, 1)
 	go func() {
 		_, e := c.Write(payload)

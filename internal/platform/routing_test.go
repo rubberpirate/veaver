@@ -72,7 +72,7 @@ func TestWeightedUpdatePreservesRoutes(t *testing.T) {
 		t.Fatalf("updated routes during weight change: %+v", f.calls)
 	}
 	for _, c := range f.calls {
-		if c.Program != "nft" || !strings.HasPrefix(c.Input, "delete table ip linkweave\n") {
+		if c.Program != "nft" || !strings.HasPrefix(c.Input, "delete table ip veaver\n") {
 			t.Fatal("nontransactional scheduler update", c)
 		}
 	}

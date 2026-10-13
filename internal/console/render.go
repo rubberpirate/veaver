@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"linkweave/internal/platform"
-	"linkweave/internal/service"
+	"github.com/rubberpirate/veaver/internal/platform"
+	"github.com/rubberpirate/veaver/internal/service"
 )
 
 // Interface names, journal data and API errors must never become terminal commands.
@@ -208,7 +208,7 @@ func (m *model) reviewRows(width int) []string {
 func (m *model) render(width, height int, color bool) string {
 	width = max(20, min(width, 240))
 	height = max(5, height)
-	rows := []string{fit(" LINKWEAVE  /  NetworkManager console", width)}
+	rows := []string{fit(" VEAVER  /  NetworkManager console", width)}
 	s := m.snapshot
 	stamp := "waiting"
 	if !s.Time.IsZero() {

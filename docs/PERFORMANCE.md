@@ -2,13 +2,13 @@
 
 Direct mode should preserve ordinary kernel-networking performance. Relay mode adds TLS/proxy/relay processing and can improve throughput when independent uplinks are the bottleneck. These are engineering expectations, not measured production guarantees.
 
-Do not benchmark Linkweave's manager CPU against NetworkManager's manager CPU and label that application throughput. Compare actual transfers under equivalent link conditions.
+Do not benchmark Veaver's manager CPU against NetworkManager's manager CPU and label that application throughput. Compare actual transfers under equivalent link conditions.
 
 ## Required comparison
 
 Use the same machine and destination and repeat each measurement at least five times:
 
-1. Stock NetworkManager without Linkweave.
+1. Stock NetworkManager without Veaver.
 2. Observe mode.
 3. Balance mode, one uplink and both uplinks: a single stream, then multiple concurrent TCP/UDP streams.
 4. Relay mode, one uplink and both: a single large upload/download, then concurrent application transfers.

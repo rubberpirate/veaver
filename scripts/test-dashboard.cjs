@@ -2,14 +2,14 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const {chromium} = require(process.env.LINKWEAVE_PLAYWRIGHT_PATH || 'playwright');
+const {chromium} = require(process.env.VEAVER_PLAYWRIGHT_PATH || 'playwright');
 
 (async () => {
- const base = process.env.LINKWEAVE_TEST_URL || 'http://127.0.0.1:8787';
- const tokenFile = process.env.LINKWEAVE_TEST_TOKEN_FILE;
- if (!tokenFile) throw Error('Set LINKWEAVE_TEST_TOKEN_FILE to a running Observe daemon token file');
+ const base = process.env.VEAVER_TEST_URL || 'http://127.0.0.1:8787';
+ const tokenFile = process.env.VEAVER_TEST_TOKEN_FILE;
+ if (!tokenFile) throw Error('Set VEAVER_TEST_TOKEN_FILE to a running Observe daemon token file');
  const token = fs.readFileSync(tokenFile, 'utf8').trim();
- const browser = await chromium.launch({headless:true, executablePath:process.env.LINKWEAVE_CHROMIUM_PATH || undefined});
+ const browser = await chromium.launch({headless:true, executablePath:process.env.VEAVER_CHROMIUM_PATH || undefined});
  const page = await browser.newPage({viewport:{width:1440,height:1000}});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
  page.on('response',r=>{if(r.status()>=400)errors.push(`HTTP ${r.status()} ${r.url()}`);});
