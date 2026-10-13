@@ -1,0 +1,7 @@
+#!/bin/sh
+# Dispatcher hooks only notify the long-running daemon; never process packets.
+case "$2" in
+  up|down|dhcp4-change|dhcp6-change|connectivity-change|vpn-up|vpn-down|reapply)
+    /usr/bin/timeout 3 /usr/local/bin/linkweave refresh --state-dir /var/lib/linkweave >/dev/null 2>&1 || :
+    ;;
+esac

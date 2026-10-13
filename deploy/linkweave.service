@@ -1,0 +1,34 @@
+[Unit]
+Description=Linkweave NetworkManager extension and local dashboard
+Documentation=https://networkmanager.dev/docs/
+Wants=NetworkManager.service
+After=NetworkManager.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/linkweave serve --config /etc/linkweave/config.json --state-dir /var/lib/linkweave
+ExecStopPost=/usr/local/bin/linkweave cleanup --state-dir /var/lib/linkweave
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=45
+StateDirectory=linkweave
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+ProtectSystem=strict
+ReadWritePaths=/etc/linkweave /var/lib/linkweave /proc/sys/net/ipv4/conf
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

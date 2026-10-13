@@ -1,0 +1,11 @@
+{
+  "mode": "observe",
+  "interfaces": [],
+  "allow_metered": false,
+  "relay": {
+    "address": "",
+    "server_name": "",
+    "ca_file": "",
+    "token_file": ""
+  }
+}

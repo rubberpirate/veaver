@@ -1,0 +1,57 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const {chromium} = require(process.env.LINKWEAVE_PLAYWRIGHT_PATH || 'playwright');
+
+(async () => {
+ const base = process.env.LINKWEAVE_TEST_URL || 'http://127.0.0.1:8787';
+ const tokenFile = process.env.LINKWEAVE_TEST_TOKEN_FILE;
+ if (!tokenFile) throw Error('Set LINKWEAVE_TEST_TOKEN_FILE to a running Observe daemon token file');
+ const token = fs.readFileSync(tokenFile, 'utf8').trim();
+ const browser = await chromium.launch({headless:true, executablePath:process.env.LINKWEAVE_CHROMIUM_PATH || undefined});
+ const page = await browser.newPage({viewport:{width:1440,height:1000}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ page.on('response',r=>{if(r.status()>=400)errors.push(`HTTP ${r.status()} ${r.url()}`);});
+ try {
+  await page.goto(base);
+  await page.locator('#token').fill(token);
+  await page.getByRole('button',{name:'Connect ↗',exact:true}).click();
+  await page.locator('#auth-panel').waitFor({state:'hidden'});
+  await page.locator('#interface-table .iface-name').first().waitFor();
+  assert.equal(await page.locator('#active-mode').textContent(),'observe mode');
+  await page.locator('#log-filter').fill('no-such-event-test');
+  assert.equal(await page.locator('#log-list').innerText(),'No matching events.');
+  await page.locator('#log-filter').fill('');
+  await page.locator('#refresh').click();
+  await page.locator('#toast').filter({hasText:'Network refresh requested'}).waitFor();
+  await page.getByRole('button',{name:'Read system journal'}).click();
+  await page.locator('#journal-note').filter({hasText:/journal|Journal/}).waitFor();
+  await page.locator('input[name="mode"][value="balance"]').check();
+	 await page.locator('#weight-input').fill('wlan0=bad');
+	 await page.getByRole('button',{name:'Review changes ↗'}).click();
+	 await page.locator('#toast').filter({hasText:'Use link weights'}).waitFor();
+	 assert.equal(await page.locator('#review-dialog').evaluate(el=>el.open),false);
+	 const response=await fetch(`${base}/api/status`,{headers:{Authorization:`Bearer ${token}`}});
+	 const live=await response.json();
+	 const eligible=live.network.interfaces.filter(d=>d.physical&&d.managed&&d.connected&&d.address&&d.gateway&&!d.metered&&!['none','portal','limited'].includes(d.connectivity));
+	 assert.ok(eligible.length,'Observe test host needs an eligible uplink for review');
+	 await page.locator('#weight-input').fill(`${eligible[0].name}=3`);
+  await page.getByRole('button',{name:'Review changes ↗'}).click();
+  await page.locator('#review-dialog[open]').waitFor();
+  assert.match(await page.locator('#review-plan').textContent(),/ct mark set numgen/);
+	 assert.ok((await page.locator('#review-plan').textContent()).includes(`numgen inc mod ${eligible.length+2}`));
+  await page.getByRole('button',{name:'Cancel',exact:true}).click();
+  await page.locator('input[name="mode"][value="observe"]').check();
+  await page.evaluate(()=>window.scrollTo(0,0));
+  fs.mkdirSync(path.join(__dirname,'../docs/screenshots'),{recursive:true});
+  await page.screenshot({path:path.join(__dirname,'../docs/screenshots/dashboard-desktop.png'),fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>window.scrollTo(0,0));
+  const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+  assert.ok(dimensions.scroll<=dimensions.width,`Mobile horizontal overflow: ${JSON.stringify(dimensions)}`);
+  await page.screenshot({path:path.join(__dirname,'../docs/screenshots/dashboard-mobile.png'),fullPage:true});
+  assert.deepEqual(errors,[]);
+  console.log('PASS: live interface data, authentication, logs, review without apply, refresh, responsive layout; no browser errors.');
+ } finally { await browser.close(); }
+})().catch(e=>{console.error(e.message);process.exitCode=1;});
